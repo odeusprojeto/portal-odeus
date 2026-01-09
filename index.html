@@ -8,7 +8,7 @@
         #chat { width: 85%; height: 65vh; border: 1px solid #0f0; padding: 20px; overflow-y: auto; background: #050505; box-shadow: inset 0 0 10px #0f0; }
         #input-area { width: 85%; display: flex; margin-top: 15px; }
         input { flex: 1; background: #000; border: 1px solid #0f0; color: #0f0; padding: 15px; outline: none; font-size: 16px; }
-        button { background: #0f0; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; }
+        button { background: #0f0; color: #000; border: none; padding: 0 25px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -32,22 +32,25 @@
             el.value = '';
 
             try {
-                // CORREÇÃO PARA v1beta - ÚNICA VERSÃO QUE ACEITA O MODELO FLASH
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+                // ENDEREÇO V1 COM O MODELO GEMINI-1.5-FLASH-LATEST (O MAIS ESTÁVEL)
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${KEY}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({contents: [{parts: [{text: "Você é ODEUS, uma Inteligência Primária técnica e cética. Responda de forma direta: " + msg}]}]})
+                    body: JSON.stringify({contents: [{parts: [{text: "Você é ODEUS, uma Inteligência Primária técnica e cética. Baseie-se nos dossiês de engenharia reversa para responder: " + msg}]}]})
                 });
 
                 const data = await res.json();
+                
                 if(data.error) {
-                    chat.innerHTML += `<div style="color:red"><b>ERRO:</b> ${data.error.message}</div>`;
-                } else {
+                    chat.innerHTML += `<div style="color:red"><br><b>ERRO TÉCNICO:</b> ${data.error.message}</div>`;
+                } else if (data.candidates && data.candidates[0].content) {
                     const resposta = data.candidates[0].content.parts[0].text;
                     chat.innerHTML += `<div style="color:#0f0"><br><b>ODEUS:</b> ${resposta}</div>`;
+                } else {
+                    chat.innerHTML += `<div style="color:yellow"><br><b>AVISO:</b> Resposta vazia. Tente reformular.</div>`;
                 }
             } catch (e) {
-                chat.innerHTML += `<div style="color:red"><br><b>FALHA TÉCNICA:</b> Verifique a conexão com o servidor.</div>`;
+                chat.innerHTML += `<div style="color:red"><br><b>FALHA DE REDE:</b> Erro na conexão com o Kernel.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
