@@ -25,7 +25,7 @@
 </head>
 <body>
     <h1 style="letter-spacing: 15px; text-shadow: 0 0 10px #0f0; margin-bottom: 10px;">ODEUS</h1>
-    <div id="chat"><div class="msg ai"><b>SISTEMA:</b> Kernel 0 em modo de segurança absoluta. Aguardando comandos...</div></div>
+    <div id="chat"><div class="msg ai"><b>SISTEMA:</b> Kernel 0 em modo de segurança absoluta.</div></div>
     <div id="input-area">
         <input type="text" id="cmd" placeholder="Inicie a auditoria..." onkeydown="if(event.key==='Enter') send()">
         <button id="btn" onclick="send()">GO</button>
@@ -34,7 +34,7 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // SUA CHAVE MESTRE ATUALIZADA
+        // CHAVE NOVA DO PROJETO 620505958656
         const API_KEY = "AIzaSyBb_qnUe7leCB1Br2ngpcLEaiq3FTSY40g"; 
         const genAI = new GoogleGenerativeAI(API_KEY);
 
@@ -50,7 +50,7 @@
             btn.disabled = true;
 
             try {
-                // USANDO O MOTOR 1.5 FLASH VIA BIBLIOTECA OFICIAL
+                // USANDO O MODELO FLASH VIA BIBLIOTECA OFICIAL - SEM ERRO DE ROTA
                 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
                 const result = await model.generateContent("Responda como ODEUS, técnico e cético: " + msg);
                 const response = await result.response;
