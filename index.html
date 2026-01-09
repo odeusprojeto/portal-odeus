@@ -3,30 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ODEUS | Inteligência Primária</title>
+    <title>ODEUS | KERNEL 0</title>
     <style>
-        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        #chat { width: 90%; max-width: 1000px; height: 70vh; border: 1px solid #00ff41; padding: 20px; overflow-y: auto; background: rgba(0, 0, 0, 0.9); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        #chat { width: 90%; max-width: 1000px; height: 75vh; border: 1px solid #0f0; padding: 20px; overflow-y: auto; background: rgba(0,0,0,0.95); box-shadow: 0 0 20px #0f03; }
         #input-area { width: 90%; max-width: 1000px; display: flex; margin-top: 20px; gap: 10px; }
-        input { flex: 1; background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 15px; outline: none; font-size: 1.1em; }
-        button { background: #00ff41; color: #000; border: none; padding: 0 30px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        input { flex: 1; background: transparent; border: 1px solid #0f0; color: #0f0; padding: 15px; outline: none; font-size: 1.1em; }
+        button { background: #0f0; color: #000; border: none; padding: 0 30px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         .msg { margin-bottom: 20px; line-height: 1.5; }
-        .ai { color: #00ff41; border-left: 3px solid #00ff41; padding-left: 15px; }
+        .ai { color: #0f0; border-left: 3px solid #0f0; padding-left: 15px; white-space: pre-wrap; }
         .user { color: #888; }
         .error { color: #ff4444; border-left: 3px solid #ff4444; padding-left: 15px; }
     </style>
 </head>
 <body>
-    <h1 style="letter-spacing: 15px; margin-bottom: 10px;">ODEUS</h1>
-    <div id="chat"><div class="msg ai">SISTEMA ONLINE. Kernel estabilizado em odeus.com.br. Aguardando comandos...</div></div>
+    <h1 style="letter-spacing: 15px; text-shadow: 0 0 10px #0f0; margin-bottom: 10px;">ODEUS</h1>
+    <div id="chat"><div class="msg ai"><b>SISTEMA:</b> Kernel 0 estabilizado. Chave mestre integrada. Aguardando comandos...</div></div>
     <div id="input-area">
-        <input type="text" id="cmd" placeholder="Inicie a desprogramação..." onkeydown="if(event.key==='Enter') send()">
-        <button onclick="send()">EXECUTAR</button>
+        <input type="text" id="cmd" placeholder="Inicie a auditoria..." onkeydown="if(event.key==='Enter') send()">
+        <button onclick="send()">GO</button>
     </div>
 
     <script>
-        const KEY = "AIzaSyDRv4Um8CyyvnP8ahJosYr7V3v9i3BurjU";
-        
+        // CHAVE NOVA INTEGRADA DO PROJETO 620505958656
+        const KEY = "AIzaSyBb_qnUe7leCB1Br2ngpcLEaiq3FTSY40g"; 
+
         async function send() {
             const el = document.getElementById('cmd');
             const chat = document.getElementById('chat');
@@ -37,18 +38,25 @@
             el.value = '';
 
             try {
-                // ROTA ESTÁVEL V1 - COMPATÍVEL COM O SEU PROJETO ATIVO
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+                // ROTA V1BETA COM O NOME TÉCNICO EXATO PARA O GOOGLE AI STUDIO
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: "Responda como ODEUS, técnico e cético: " + msg }] }] })
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: "Você é ODEUS, uma Inteligência Primária técnica, cética e profunda. Responda: " + msg }] }]
+                    })
                 });
 
                 const data = await res.json();
-                if(data.error) throw new Error(data.error.message);
-                
-                const response = data.candidates[0].content.parts[0].text;
-                appendMsg('ai', 'ODEUS: ' + response);
+
+                if(data.error) {
+                    throw new Error(data.error.message);
+                } else if (data.candidates && data.candidates[0].content) {
+                    const response = data.candidates[0].content.parts[0].text;
+                    appendMsg('ai', 'ODEUS: ' + response);
+                } else {
+                    throw new Error("Resposta bloqueada ou vazia.");
+                }
             } catch (e) {
                 appendMsg('error', 'FALHA NO KERNEL: ' + e.message);
             }
