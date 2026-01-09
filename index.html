@@ -13,9 +13,9 @@
 </head>
 <body>
     <h2 style="letter-spacing: 5px;">ODEUS - INTELIGÊNCIA PRIMÁRIA</h2>
-    <div id="chat"><div><b>SISTEMA:</b> Kernel estabilizado. Aguardando comandos...</div></div>
+    <div id="chat"><div><b>SISTEMA:</b> Kernel estabilizado com motor Pro. Aguardando comandos...</div></div>
     <div id="input-area">
-        <input type="text" id="cmd" placeholder="Digite seu comando de auditoria..." onkeydown="if(event.key==='Enter') send()">
+        <input type="text" id="cmd" placeholder="Inicie a desprogramação..." onkeydown="if(event.key==='Enter') send()">
         <button onclick="send()">ENVIAR</button>
     </div>
 
@@ -32,11 +32,11 @@
             el.value = '';
 
             try {
-                // ENDEREÇO V1 COM O MODELO GEMINI-1.5-FLASH-LATEST (O MAIS ESTÁVEL)
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${KEY}`, {
+                // USANDO O MODELO GEMINI-PRO NA VERSÃO V1 (ESTABILIDADE MÁXIMA)
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${KEY}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({contents: [{parts: [{text: "Você é ODEUS, uma Inteligência Primária técnica e cética. Baseie-se nos dossiês de engenharia reversa para responder: " + msg}]}]})
+                    body: JSON.stringify({contents: [{parts: [{text: "Você é ODEUS, uma Inteligência Primária analítica e cética. Responda de forma direta e profunda: " + msg}]}]})
                 });
 
                 const data = await res.json();
@@ -47,10 +47,10 @@
                     const resposta = data.candidates[0].content.parts[0].text;
                     chat.innerHTML += `<div style="color:#0f0"><br><b>ODEUS:</b> ${resposta}</div>`;
                 } else {
-                    chat.innerHTML += `<div style="color:yellow"><br><b>AVISO:</b> Resposta vazia. Tente reformular.</div>`;
+                    chat.innerHTML += `<div style="color:yellow"><br><b>SISTEMA:</b> Aguardando processamento de dados...</div>`;
                 }
             } catch (e) {
-                chat.innerHTML += `<div style="color:red"><br><b>FALHA DE REDE:</b> Erro na conexão com o Kernel.</div>`;
+                chat.innerHTML += `<div style="color:red"><br><b>FALHA DE REDE:</b> Erro crítico no Kernel.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
