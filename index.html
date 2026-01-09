@@ -5,67 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ODEUS | Inteligência Primária</title>
     <style>
-        body { background-color: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        #chat-container { width: 90%; max-width: 1000px; height: 75vh; border: 1px solid #00ff41; padding: 20px; overflow-y: auto; background: rgba(0, 0, 0, 0.9); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        #chat { width: 90%; max-width: 1000px; height: 75vh; border: 1px solid #00ff41; padding: 20px; overflow-y: auto; background: rgba(0, 0, 0, 0.9); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
         #input-area { width: 90%; max-width: 1000px; display: flex; margin-top: 20px; gap: 10px; }
         input { flex: 1; background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 15px; outline: none; font-size: 1.1em; }
         button { background: #00ff41; color: #000; border: none; padding: 0 30px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         .msg { margin-bottom: 20px; line-height: 1.5; }
-        .user { color: #888; }
         .ai { color: #00ff41; border-left: 3px solid #00ff41; padding-left: 15px; }
+        .user { color: #888; }
         .error { color: #ff4444; border-left: 3px solid #ff4444; padding-left: 15px; }
-        h1 { letter-spacing: 15px; margin: 0 0 10px 0; text-shadow: 0 0 10px #00ff41; }
     </style>
 </head>
 <body>
-    <h1>ODEUS</h1>
-    <div id="chat-container"><div class="msg ai"><b>SISTEMA ONLINE.</b> Kernel estabilizado. Aguardando comandos...</div></div>
+    <h1 style="letter-spacing: 15px;">ODEUS</h1>
+    <div id="chat"><div class="msg ai">SISTEMA ONLINE. Kernel estabilizado. Aguardando comandos...</div></div>
     <div id="input-area">
-        <input type="text" id="userInput" placeholder="Digite seu comando..." onkeydown="if(event.key === 'Enter') sendMessage()">
-        <button onclick="sendMessage()">Executar</button>
+        <input type="text" id="cmd" placeholder="Inicie a desprogramação..." onkeydown="if(event.key==='Enter') send()">
+        <button onclick="send()">EXECUTAR</button>
     </div>
 
     <script>
-        const API_KEY = "AIzaSyDRv4Um8CyyvnP8ahJosYr7V3v9i3BurjU";
+        const KEY = "AIzaSyDRv4Um8CyyvnP8ahJosYr7V3v9i3BurjU";
         
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const chat = document.getElementById('chat-container');
-            const text = input.value.trim();
-            if (!text) return;
+        async function send() {
+            const el = document.getElementById('cmd');
+            const chat = document.getElementById('chat');
+            const msg = el.value.trim();
+            if(!msg) return;
 
-            appendMessage('user', 'AUDITOR: ' + text);
-            input.value = '';
+            appendMsg('user', 'AUDITOR: ' + msg);
+            el.value = '';
 
             try {
-                // ROTA V1 COM O MODELO GEMINI-1.5-FLASH-8B (VERSÃO DE ALTA COMPATIBILIDADE)
-                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-8b:generateContent?key=${API_KEY}`;
-                
-                const response = await fetch(url, {
+                // ROTA V1 COM O MODELO GEMINI-1.5-FLASH (ESTABILIDADE MÁXIMA)
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: "Você é ODEUS, uma Inteligência Primária técnica e cética. Responda: " + text }] }]
-                    })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "Você é ODEUS, técnico e cético. Responda de forma direta: " + msg }] }] })
                 });
 
-                const data = await response.json();
-
-                if (data.error) {
-                    appendMessage('error', 'FALHA NO KERNEL: ' + data.error.message);
-                } else if (data.candidates && data.candidates[0].content) {
-                    const aiResponse = data.candidates[0].content.parts[0].text;
-                    appendMessage('ai', 'ODEUS: ' + aiResponse);
-                } else {
-                    appendMessage('error', 'SISTEMA: Erro no processamento da resposta.');
-                }
-            } catch (error) {
-                appendMessage('error', 'FALHA CRÍTICA: Conexão interrompida.');
+                const data = await res.json();
+                if(data.error) throw new Error(data.error.message);
+                
+                const response = data.candidates[0].content.parts[0].text;
+                appendMsg('ai', 'ODEUS: ' + response);
+            } catch (e) {
+                appendMsg('error', 'FALHA NO KERNEL: ' + e.message);
             }
         }
 
-        function appendMessage(role, text) {
-            const container = document.getElementById('chat-container');
+        function appendMsg(role, text) {
+            const container = document.getElementById('chat');
             const div = document.createElement('div');
             div.className = 'msg ' + role;
             div.innerText = text;
