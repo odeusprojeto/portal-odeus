@@ -18,14 +18,14 @@
 </head>
 <body>
     <h1 style="letter-spacing: 15px; text-shadow: 0 0 10px #0f0; margin-bottom: 10px;">ODEUS</h1>
-    <div id="chat"><div class="msg ai"><b>SISTEMA:</b> Kernel 0 pronto para auditoria. Chave integrada.</div></div>
+    <div id="chat"><div class="msg ai"><b>SISTEMA:</b> Kernel 0 operando em modo Pro Estável.</div></div>
     <div id="input-area">
         <input type="text" id="cmd" placeholder="Inicie a auditoria..." onkeydown="if(event.key==='Enter') send()">
         <button onclick="send()">GO</button>
     </div>
 
     <script>
-        // CHAVE NOVA DO PROJETO 620505958656
+        // CHAVE NOVA INTEGRADA
         const KEY = "AIzaSyBb_qnUe7leCB1Br2ngpcLEaiq3FTSY40g"; 
 
         async function send() {
@@ -38,8 +38,8 @@
             el.value = '';
 
             try {
-                // ROTA V1 COM NOME TÉCNICO COMPLETO
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+                // ROTA V1 COM MODELO GEMINI-PRO (A VERSÃO MAIS ESTÁVEL DO GOOGLE)
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${KEY}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
