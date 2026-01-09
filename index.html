@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ODEUS | Inteligência Primária</title>
     <style>
-        /* Arquitetura Visual Dark/Terminal */
         body { 
-            background-color: #0a0a0a; 
+            background-color: #050505; 
             color: #00ff41; 
             font-family: 'Courier New', monospace; 
             display: flex; 
@@ -19,20 +18,18 @@
             overflow: hidden; 
         }
         #chat-container { 
-            width: 85%; 
-            max-width: 900px; 
-            height: 70vh; 
+            width: 90%; 
+            max-width: 1000px; 
+            height: 75vh; 
             border: 1px solid #00ff41; 
             padding: 20px; 
             overflow-y: auto; 
-            background: rgba(0, 0, 0, 0.95); 
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1); 
-            scrollbar-width: thin;
-            scrollbar-color: #00ff41 #000;
+            background: rgba(0, 0, 0, 0.9); 
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); 
         }
-        #input-container { 
-            width: 85%; 
-            max-width: 900px; 
+        #input-area { 
+            width: 90%; 
+            max-width: 1000px; 
             display: flex; 
             margin-top: 20px; 
             gap: 10px;
@@ -43,21 +40,86 @@
             border: 1px solid #00ff41; 
             color: #00ff41; 
             padding: 15px; 
-            font-size: 1em; 
             outline: none; 
+            font-size: 1.1em;
         }
         button { 
             background: #00ff41; 
             color: #000; 
             border: none; 
-            padding: 0 25px; 
+            padding: 0 30px; 
             cursor: pointer; 
             font-weight: bold; 
             text-transform: uppercase;
-            transition: 0.2s;
         }
-        button:hover { background: #008f11; }
-        .msg { margin-bottom: 20px; line-height: 1.6; word-wrap: break-word; }
+        .msg { margin-bottom: 20px; line-height: 1.5; }
         .user { color: #888; }
         .ai { color: #00ff41; border-left: 3px solid #00ff41; padding-left: 15px; }
-        .error { color: #ff4444; border-left: 3px solid #ff4444; padding-left:
+        .error { color: #ff4444; border-left: 3px solid #ff4444; padding-left: 15px; }
+        h1 { letter-spacing: 15px; margin: 0 0 10px 0; text-shadow: 0 0 10px #00ff41; }
+    </style>
+</head>
+<body>
+
+    <h1>ODEUS</h1>
+
+    <div id="chat-container">
+        <div class="msg ai"><b>SISTEMA ONLINE.</b> Aguardando comandos para auditoria de realidade...</div>
+    </div>
+
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Digite seu comando..." onkeydown="if(event.key === 'Enter') sendMessage()">
+        <button onclick="sendMessage()">Executar</button>
+    </div>
+
+    <script>
+        const API_KEY = "AIzaSyDRv4Um8CyyvnP8ahJosYr7V3v9i3BurjU";
+        
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chat = document.getElementById('chat-container');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            appendMessage('user', 'AUDITOR: ' + text);
+            input.value = '';
+
+            try {
+                // ENDPOINT V1 COM O MODEL_ID ABSOLUTO (CORREÇÃO DEFINITIVA)
+                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: "Você é ODEUS, Especialista em Análise de Sistemas e Lógica de Dados. Perfil: técnico, cético e analítico. Responda: " + text }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    appendMessage('error', 'FALHA NO KERNEL: ' + data.error.message);
+                } else {
+                    const aiResponse = data.candidates[0].content.parts[0].text;
+                    appendMessage('ai', 'ODEUS: ' + aiResponse);
+                }
+            } catch (error) {
+                appendMessage('error', 'FALHA CRÍTICA: Conexão interrompida pelo servidor.');
+            }
+        }
+
+        function appendMessage(role, text) {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = 'msg ' + role;
+            div.innerText = text;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>
