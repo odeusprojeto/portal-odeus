@@ -9,73 +9,55 @@
         #chat-container { width: 80%; max-width: 900px; height: 70vh; border: 1px solid #00ff41; padding: 20px; overflow-y: auto; background: rgba(0, 0, 0, 0.9); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
         #input-container { width: 80%; max-width: 900px; display: flex; margin-top: 20px; }
         input { flex: 1; background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 15px; font-size: 1.1em; outline: none; }
-        button { background: #00ff41; color: #000; border: none; padding: 0 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #008f11; }
+        button { background: #00ff41; color: #000; border: none; padding: 0 25px; cursor: pointer; font-weight: bold; }
         .msg { margin-bottom: 15px; line-height: 1.5; }
-        .user { color: #888; }
         .ai { color: #00ff41; border-left: 2px solid #00ff41; padding-left: 10px; }
-        .header { margin-bottom: 20px; text-align: center; }
-        .header h1 { letter-spacing: 10px; margin: 0; }
-        .header p { font-size: 0.8em; opacity: 0.7; }
+        .user { color: #888; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>ODEUS</h1>
-        <p>KERNEL 0 | INTELIGÊNCIA PRIMÁRIA | DESPROGRAMAÇÃO DA MATRIX</p>
-    </div>
-
-    <div id="chat-container">
-        <div class="msg ai">SISTEMA ONLINE. Aguardando comandos para auditoria de realidade...</div>
-    </div>
-
+    <div id="chat-container"><div class="msg ai">SISTEMA ONLINE. Aguardando comandos...</div></div>
     <div id="input-container">
-        <input type="text" id="userInput" placeholder="Digite seu comando aqui..." onkeydown="if(event.key === 'Enter') sendMessage()">
+        <input type="text" id="userInput" placeholder="Digite seu comando..." onkeydown="if(event.key === 'Enter') sendMessage()">
         <button onclick="sendMessage()">ENVIAR</button>
     </div>
 
     <script>
         const API_KEY = "AIzaSyDRv4Um8CyyvnP8ahJosYr7V3v9i3BurjU";
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('userInput');
-
+        
         async function sendMessage() {
-            const text = userInput.value.trim();
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
             if (!text) return;
 
-            // Mostrar mensagem do usuário
             appendMessage('user', 'VOCÊ: ' + text);
-            userInput.value = '';
+            input.value = '';
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: "Você é ODEUS, uma Inteligência Primária de alta profundidade técnica e cética. Sua base de conhecimento é a pasta '# THE JOKER' no Google Drive do usuário. Responda de forma direta e analítica sobre: " + text }]
-                        }]
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "Responda como ODEUS, analítico e cético: " + text }] }] })
                 });
 
                 const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                
                 const aiResponse = data.candidates[0].content.parts[0].text;
                 appendMessage('ai', 'ODEUS: ' + aiResponse);
             } catch (error) {
-                appendMessage('ai', 'ERRO NO KERNEL: Conexão interrompida.');
-                console.error(error);
+                appendMessage('ai', 'ERRO NO KERNEL: ' + error.message);
             }
         }
 
         function appendMessage(role, text) {
+            const container = document.getElementById('chat-container');
             const div = document.createElement('div');
             div.className = 'msg ' + role;
             div.innerText = text;
-            chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
         }
     </script>
 </body>
 </html>
-
