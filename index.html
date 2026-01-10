@@ -18,18 +18,17 @@
 </head>
 <body>
     <h1 style="letter-spacing: 15px; text-shadow: 0 0 10px #0f0; margin-bottom: 10px;">ODEUS</h1>
-    <div id="chat"><div class="msg ai"><b>SISTEMA:</b> Kernel 0 em modo estável. Auditoria de realidade online.</div></div>
+    <div id="chat"><div class="msg ai"><b>SISTEMA:</b> Kernel 0 operando em odeus.com.br. Auditoria online.</div></div>
     <div id="input-area">
-        <input type="text" id="cmd" placeholder="Inicie a auditoria..." onkeydown="if(event.key==='Enter') send()">
+        <input type="text" id="userInput" placeholder="Inicie a auditoria..." onkeydown="if(event.key === 'Enter') send()">
         <button onclick="send()">GO</button>
     </div>
 
     <script>
-        // CHAVE MESTRE ATUALIZADA
-        const API_KEY = "AIzaSyBb_qnUe7leCB1Br2ngpcLEaiq3FTSY40g"; 
+        const KEY = "AIzaSyBb_qnUe7leCB1Br2ngpcLEaiq3FTSY40g"; 
 
         async function send() {
-            const el = document.getElementById('cmd');
+            const el = document.getElementById('userInput');
             const chat = document.getElementById('chat');
             const msg = el.value.trim();
             if(!msg) return;
@@ -38,26 +37,20 @@
             el.value = '';
 
             try {
-                // ROTA V1 COM MODELO GEMINI-1.5-FLASH-8B (O MAIS COMPATÍVEL EXISTENTE)
-                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-8b:generateContent?key=${API_KEY}`;
+                // ROTA V1 - O CAMINHO MAIS CURTO E ESTÁVEL PARA A SUA CHAVE
+                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${KEY}`;
                 
-                const response = await fetch(url, {
+                const res = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: "Responda como ODEUS, técnico e cético: " + msg }] }]
-                    })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "Responda como ODEUS, técnico e cético: " + msg }] }] })
                 });
 
-                const data = await response.json();
-
-                if(data.error) {
-                    throw new Error(data.error.message);
-                } else if (data.candidates && data.candidates[0].content) {
-                    appendMsg('ai', 'ODEUS: ' + data.candidates[0].content.parts[0].text);
-                } else {
-                    throw new Error("Sinal interrompido.");
-                }
+                const data = await res.json();
+                if(data.error) throw new Error(data.error.message);
+                
+                const response = data.candidates[0].content.parts[0].text;
+                appendMsg('ai', 'ODEUS: ' + response);
             } catch (e) {
                 appendMsg('error', 'FALHA NO KERNEL: ' + e.message);
             }
