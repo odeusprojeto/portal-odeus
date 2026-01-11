@@ -6,130 +6,96 @@
   <title>ODEUS | KERNEL 0</title>
 
   <style>
-    :root {
-      --bg: #000;
-      --fg: #00ff3b;
-      --fg-dim: rgba(0, 255, 59, 0.6);
-      --err: #ff3b3b;
-      --panel: rgba(0, 255, 59, 0.08);
-      --border: rgba(0, 255, 59, 0.9);
-      --shadow: 0 0 12px rgba(0, 255, 59, 0.25);
-      --font: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
     body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 16px;
-      overflow: hidden;
-    }
+    background: radial-gradient(circle at top, #1a0f2e 0%, #0b0614 60%);
+    color: #e6dbff;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
 
-    .wrap {
-      width: min(860px, 100%);
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+  h1 {
+    color: #b88cff;
+    letter-spacing: 6px;
+    font-weight: 300;
+    margin-bottom: 12px;
+    text-shadow: 0 0 12px rgba(122, 60, 255, 0.4);
+  }
 
-    .title {
-      text-align: center;
-      letter-spacing: 10px;
-      text-shadow: var(--shadow);
-      margin: 4px 0 0 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
+  #chat {
+    width: 90%;
+    max-width: 1000px;
+    height: 70vh;
+    border: 1px solid rgba(122, 60, 255, 0.4);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(20, 10, 40, 0.6);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 40px rgba(122, 60, 255, 0.15);
+  }
 
-    .panel {
-      border: 2px solid var(--border);
-      box-shadow: var(--shadow);
-      background: radial-gradient(circle at 10% 10%, rgba(0,255,59,0.05), transparent 35%),
-                  radial-gradient(circle at 90% 20%, rgba(0,255,59,0.04), transparent 35%),
-                  rgba(0,0,0,0.85);
-      padding: 14px;
-      border-radius: 2px;
-      display: flex;
-      flex-direction: column;
-      min-height: 0; /* important for flex scroll */
-      flex: 1;
-    }
+  .msg {
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
 
-    .systemline {
-      color: var(--fg-dim);
-      font-size: 13px;
-      margin-bottom: 10px;
-      white-space: pre-wrap;
-    }
+  .ai {
+    color: #e6dbff;
+    border-left: 3px solid #7a3cff;
+    padding-left: 16px;
+  }
 
-    #chat {
-      flex: 1;
-      overflow: auto;
-      padding-right: 6px;
-      line-height: 1.35;
-      font-size: 14px;
-    }
+  .user {
+    color: #b89cff;
+  }
 
-    /* scrollbar */
-    #chat::-webkit-scrollbar { width: 10px; }
-    #chat::-webkit-scrollbar-thumb { background: rgba(0,255,59,0.25); border-radius: 10px; }
-    #chat::-webkit-scrollbar-track { background: rgba(0,0,0,0.35); }
+  .input-area {
+    width: 90%;
+    max-width: 1000px;
+    display: flex;
+    margin-top: 18px;
+    gap: 10px;
+  }
 
-    .msg { margin: 0 0 10px 0; white-space: pre-wrap; }
-    .user { color: rgba(255,255,255,0.92); }
-    .bot { color: var(--fg); }
-    .error { color: var(--err); }
+  input {
+    flex: 1;
+    background: rgba(122, 60, 255, 0.08);
+    border: 1px solid rgba(122, 60, 255, 0.4);
+    color: #e6dbff;
+    padding: 14px;
+    font-size: 1em;
+    outline: none;
+  }
 
-    .inputbar {
-      width: 100%;
-      border: 2px solid var(--border);
-      box-shadow: var(--shadow);
-      background: rgba(0,0,0,0.9);
-      padding: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+  input::placeholder {
+    color: #9d7bff;
+  }
 
-    #userInput {
-      flex: 1;
-      background: transparent;
-      border: 1px solid rgba(0,255,59,0.4);
-      padding: 12px 10px;
-      color: rgba(255,255,255,0.92);
-      font-family: var(--font);
-      font-size: 14px;
-      outline: none;
-    }
-    #userInput::placeholder { color: rgba(255,255,255,0.35); }
+  button {
+    background: linear-gradient(135deg, #7a3cff, #9f6bff);
+    color: #0b0614;
+    border: none;
+    padding: 0 28px;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
 
-    #sendBtn {
-      background: var(--fg);
-      border: none;
-      color: #000;
-      font-weight: 800;
-      padding: 12px 18px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    #sendBtn:active { transform: translateY(1px); }
-    #sendBtn[disabled] { opacity: 0.5; cursor: not-allowed; }
+  button:hover {
+    filter: brightness(1.1);
+  }
 
-    .hint {
-      margin-top: 6px;
-      font-size: 12px;
-      color: rgba(0,255,59,0.45);
-      text-align: center;
-    }
+  small {
+    margin-top: 10px;
+    color: #7f6bb3;
+    font-size: 0.75em;
+    opacity: 0.8;
+  }
   </style>
 </head>
 
@@ -220,3 +186,4 @@
   </script>
 </body>
 </html>
+
