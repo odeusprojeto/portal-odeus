@@ -1,74 +1,222 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ODEUS | KERNEL 0</title>
+
   <style>
-    body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-    #chat { width: 90%; max-width: 1000px; height: 75vh; border: 1px solid #0f0; padding: 20px; overflow-y: auto; background: rgba(0,0,0,0.95); box-shadow: 0 0 20px #0f03; }
-    #input-area { width: 90%; max-width: 1000px; display: flex; margin-top: 20px; gap: 10px; }
-    input { flex: 1; background: transparent; border: 1px solid #0f0; color: #0f0; padding: 15px; outline: none; font-size: 1.1em; }
-    button { background: #0f0; color: #000; border: none; padding: 0 30px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-    .msg { margin-bottom: 20px; line-height: 1.5; }
-    .ai { color: #0f0; border-left: 3px solid #0f0; padding-left: 15px; white-space: pre-wrap; }
-    .user { color: #888; }
-    .error { color: #f44; border-left: 3px solid #f44; padding-left: 15px; }
+    :root {
+      --bg: #000;
+      --fg: #00ff3b;
+      --fg-dim: rgba(0, 255, 59, 0.6);
+      --err: #ff3b3b;
+      --panel: rgba(0, 255, 59, 0.08);
+      --border: rgba(0, 255, 59, 0.9);
+      --shadow: 0 0 12px rgba(0, 255, 59, 0.25);
+      --font: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .wrap {
+      width: min(860px, 100%);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .title {
+      text-align: center;
+      letter-spacing: 10px;
+      text-shadow: var(--shadow);
+      margin: 4px 0 0 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .panel {
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow);
+      background: radial-gradient(circle at 10% 10%, rgba(0,255,59,0.05), transparent 35%),
+                  radial-gradient(circle at 90% 20%, rgba(0,255,59,0.04), transparent 35%),
+                  rgba(0,0,0,0.85);
+      padding: 14px;
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0; /* important for flex scroll */
+      flex: 1;
+    }
+
+    .systemline {
+      color: var(--fg-dim);
+      font-size: 13px;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+    }
+
+    #chat {
+      flex: 1;
+      overflow: auto;
+      padding-right: 6px;
+      line-height: 1.35;
+      font-size: 14px;
+    }
+
+    /* scrollbar */
+    #chat::-webkit-scrollbar { width: 10px; }
+    #chat::-webkit-scrollbar-thumb { background: rgba(0,255,59,0.25); border-radius: 10px; }
+    #chat::-webkit-scrollbar-track { background: rgba(0,0,0,0.35); }
+
+    .msg { margin: 0 0 10px 0; white-space: pre-wrap; }
+    .user { color: rgba(255,255,255,0.92); }
+    .bot { color: var(--fg); }
+    .error { color: var(--err); }
+
+    .inputbar {
+      width: 100%;
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow);
+      background: rgba(0,0,0,0.9);
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #userInput {
+      flex: 1;
+      background: transparent;
+      border: 1px solid rgba(0,255,59,0.4);
+      padding: 12px 10px;
+      color: rgba(255,255,255,0.92);
+      font-family: var(--font);
+      font-size: 14px;
+      outline: none;
+    }
+    #userInput::placeholder { color: rgba(255,255,255,0.35); }
+
+    #sendBtn {
+      background: var(--fg);
+      border: none;
+      color: #000;
+      font-weight: 800;
+      padding: 12px 18px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    #sendBtn:active { transform: translateY(1px); }
+    #sendBtn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: rgba(0,255,59,0.45);
+      text-align: center;
+    }
   </style>
 </head>
+
 <body>
-  <h1 style="letter-spacing: 15px; text-shadow: 0 0 10px #0f0; margin-bottom: 10px;">ODEUS</h1>
+  <div class="wrap">
+    <h1 class="title">ODEUS</h1>
 
-  <div id="chat">
-    <div class="msg ai"><b>SISTEMA:</b> Kernel 0 operando em odeus.com.br. Auditoria online.</div>
-  </div>
+    <div class="panel">
+      <div class="systemline">| SISTEMA: Kernel 0 operando em odeus.com.br. Auditoria online.</div>
+      <div id="chat"></div>
+    </div>
 
-  <div id="input-area">
-    <input type="text" id="userInput" placeholder="Inicie a auditoria..." onkeydown="if(event.key === 'Enter') send()">
-    <button onclick="send()">GO</button>
+    <div class="inputbar">
+      <input id="userInput" type="text" placeholder="Inicie a auditoria..." autocomplete="off" />
+      <button id="sendBtn" onclick="send()">GO</button>
+    </div>
+
+    <div class="hint">Enter envia • Shift+Enter não quebra linha (modo terminal)</div>
   </div>
 
   <script>
-    async function send() {
-      const el = document.getElementById('userInput');
-      const msg = el.value.trim();
-      if(!msg) return;
+    const input = document.getElementById("userInput");
+    const btn = document.getElementById("sendBtn");
 
-      appendMsg('user', 'AUDITOR: ' + msg);
-      el.value = '';
+    // Enter envia
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        send();
+      }
+    });
+
+    function appendMsg(kind, text) {
+      const chat = document.getElementById("chat");
+      const p = document.createElement("p");
+      p.className = "msg " + kind;
+      p.textContent = text;
+      chat.appendChild(p);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function setBusy(isBusy) {
+      btn.disabled = isBusy;
+      input.disabled = isBusy;
+    }
+
+    async function send() {
+      const msg = (input.value || "").trim();
+      if (!msg) return;
+
+      appendMsg("user", "AUDITOR: " + msg);
+      input.value = "";
+      setBusy(true);
 
       try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            prompt: "Responda como ODEUS, técnico e cético: " + msg
-          })
+        const r = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: msg })
         });
 
-        const data = await res.json();
+        const data = await r.json().catch(() => ({}));
 
-        if (!res.ok) {
-          const errMsg = data?.error?.message || data?.error || JSON.stringify(data);
-          throw new Error(errMsg);
+        if (!r.ok) {
+          const errTxt =
+            data?.error?.message ||
+            data?.error ||
+            JSON.stringify(data);
+          throw new Error(errTxt);
         }
 
-        const response = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "(sem resposta do modelo)";
-        appendMsg('ai', 'ODEUS: ' + response);
+        const text =
+          data?.candidates?.[0]?.content?.parts?.map(p => p.text).join("") ||
+          data?.text ||
+          "Sem resposta do modelo.";
 
+        appendMsg("bot", "ODEUS: " + text);
       } catch (e) {
-        appendMsg('error', 'FALHA NO KERNEL: ' + e.message);
+        appendMsg("error", "FALHA NO KERNEL: " + (e?.message || String(e)));
+      } finally {
+        setBusy(false);
+        input.focus();
       }
     }
 
-    function appendMsg(role, text) {
-      const container = document.getElementById('chat');
-      const div = document.createElement('div');
-      div.className = 'msg ' + role;
-      div.innerText = text;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
-    }
+    // mensagem inicial
+    appendMsg("bot", "ODEUS: Auditor online. Diga o que você quer investigar.");
   </script>
 </body>
 </html>
