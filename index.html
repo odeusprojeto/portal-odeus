@@ -7,4 +7,68 @@
   <style>
     body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
     #chat { width: 90%; max-width: 1000px; height: 75vh; border: 1px solid #0f0; padding: 20px; overflow-y: auto; background: rgba(0,0,0,0.95); box-shadow: 0 0 20px #0f03; }
-    #input-area { width: 90%; max-width: 1000px; display: flex; margin-t
+    #input-area { width: 90%; max-width: 1000px; display: flex; margin-top: 20px; gap: 10px; }
+    input { flex: 1; background: transparent; border: 1px solid #0f0; color: #0f0; padding: 15px; outline: none; font-size: 1.1em; }
+    button { background: #0f0; color: #000; border: none; padding: 0 30px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+    .msg { margin-bottom: 20px; line-height: 1.5; }
+    .ai { color: #0f0; border-left: 3px solid #0f0; padding-left: 15px; white-space: pre-wrap; }
+    .user { color: #888; }
+    .error { color: #f44; border-left: 3px solid #f44; padding-left: 15px; }
+  </style>
+</head>
+<body>
+  <h1 style="letter-spacing: 15px; text-shadow: 0 0 10px #0f0; margin-bottom: 10px;">ODEUS</h1>
+
+  <div id="chat">
+    <div class="msg ai"><b>SISTEMA:</b> Kernel 0 operando em odeus.com.br. Auditoria online.</div>
+  </div>
+
+  <div id="input-area">
+    <input type="text" id="userInput" placeholder="Inicie a auditoria..." onkeydown="if(event.key === 'Enter') send()">
+    <button onclick="send()">GO</button>
+  </div>
+
+  <script>
+    async function send() {
+      const el = document.getElementById('userInput');
+      const msg = el.value.trim();
+      if(!msg) return;
+
+      appendMsg('user', 'AUDITOR: ' + msg);
+      el.value = '';
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            prompt: "Responda como ODEUS, técnico e cético: " + msg
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          const errMsg = data?.error?.message || data?.error || JSON.stringify(data);
+          throw new Error(errMsg);
+        }
+
+        const response = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "(sem resposta do modelo)";
+        appendMsg('ai', 'ODEUS: ' + response);
+
+      } catch (e) {
+        appendMsg('error', 'FALHA NO KERNEL: ' + e.message);
+      }
+    }
+
+    function appendMsg(role, text) {
+      const container = document.getElementById('chat');
+      const div = document.createElement('div');
+      div.className = 'msg ' + role;
+      div.innerText = text;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+  </script>
+</body>
+</html>
